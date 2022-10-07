@@ -40,7 +40,7 @@ function setup() {
         color = color + 255 / N;
     }
 
-    terminarTurno = createButton('Terminar Turno');
+    let terminarTurno = createButton('Terminar Turno');
     terminarTurno.position(width / (1.33), width / (1.33));
     terminarTurno.mousePressed(incrementarTurno);
 
@@ -92,8 +92,9 @@ function incrementarTurno() {
     if (gameOver(nimTable)) {
 
         let ganador = player;
+
         if (!alert('El player ' + ganador + ' gano el juego\n')) {
-            //window.location.reload();
+            window.location.reload();
             console.log('que weno jaja');
         }
 
