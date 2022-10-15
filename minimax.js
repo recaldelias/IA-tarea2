@@ -15,10 +15,15 @@ function isWinnable(tabla) {
     return cantidad;
 }
 
-function miniMax(tabla, profundidad = 0, isMax = false) {
+let maxProfundidad = -1;
+
+function miniMax(tabla, profundidad , isMax = false) {
+
     let score = funcionDeEvaluacion(tabla);
     //console.log('score ---->',gameOver(tabla));
-    if (score === 10 || score === -10) return score;
+
+
+    if (profundidad == 0 ) return score;
 
     if (isMax) {
         let best = -1000;
@@ -27,7 +32,7 @@ function miniMax(tabla, profundidad = 0, isMax = false) {
                 let aux = tabla[stonePile];
                 tabla[stonePile] = i;
                 //console.log(best,'antes');
-                best = Math.max(best, miniMax(tabla, profundidad + 1, false));
+                best = Math.max(best, miniMax(tabla, profundidad - 1, false));
                 //console.log(best,'despues');
                 tabla[stonePile] = aux
             }
@@ -40,7 +45,7 @@ function miniMax(tabla, profundidad = 0, isMax = false) {
                 let aux = tabla[stonePile];
                 tabla[stonePile] = i;
                 //console.log(best,'antes');
-                best = Math.min(best, miniMax(tabla, profundidad + 1, true));
+                best = Math.min(best, miniMax(tabla, profundidad - 1, true));
                 //console.log(best,'despues');
                 tabla[stonePile] = aux;
             }
@@ -51,10 +56,16 @@ function miniMax(tabla, profundidad = 0, isMax = false) {
 
 }
 
-function miniMaxAlpha(tabla, profundidad = 0, isMax = false, alpha = Number.MIN_SAFE_INTEGER, beta = Number.MAX_SAFE_INTEGER) {
+
+
+function miniMaxAlpha(tabla, profundidad , isMax = false, alpha = Number.MIN_SAFE_INTEGER, beta = Number.MAX_SAFE_INTEGER) {
     let score = funcionDeEvaluacion(tabla);
     //console.log('score ---->',gameOver(tabla));
-    if (score === 10 || score === -10) return score;
+
+    if (profundidad> maxProfundidad){
+        maxProfundidad = profundidad;
+    }
+    if (profundidad == 0) return score;
 
     if (isMax) {    //ia
         let bestVal = Number.MIN_SAFE_INTEGER;
@@ -63,7 +74,7 @@ function miniMaxAlpha(tabla, profundidad = 0, isMax = false, alpha = Number.MIN_
                 let aux = tabla[stonePile];
                 tabla[stonePile] = i;
                 //console.log(best,'antes');
-                const value = miniMax(tabla, profundidad + 1, false, alpha, beta);
+                const value = miniMaxAlpha(tabla, profundidad - 1, false, alpha, beta);
                 bestVal = Math.max(bestVal, value);
                 alpha = Math.max(alpha, bestVal);
                 tabla[stonePile] = aux
@@ -78,7 +89,7 @@ function miniMaxAlpha(tabla, profundidad = 0, isMax = false, alpha = Number.MIN_
             for (let i = 0; i < tabla[stonePile]; i++) {
                 let aux = tabla[stonePile];
                 tabla[stonePile] = i;
-                const value = miniMax(tabla, profundidad + 1, true, alpha, beta);
+                const value = miniMaxAlpha(tabla, profundidad - 1, true, alpha, beta);
                 bestVal = Math.min(value, bestVal);
                 beta = Math.min(beta, bestVal)
                 //console.log(best,'antes');
@@ -104,11 +115,11 @@ function encontrarMejorMovimiento(nimTable, tablero, player) {
             let aux = nimTable[i];
             nimTable[i] = j;
             player = (player === 1) ? 2 : 1;
-            let valor = miniMax(nimTable);
-            console.log('i : ', i, ' j : ', j);
+            let valor = miniMaxAlpha(nimTable,4);
+            //console.log('i : ', i, ' j : ', j);
             nimTable[i] = aux;
             player = (player === 1) ? 2 : 1;
-            console.log(valor, ' ', mejorValor);
+            //console.log(valor, ' ', mejorValor);
             if (valor >= mejorValor && j > 0) {
                 mejorValor = valor;
                 mejorMovimiento.columna = i;
@@ -118,13 +129,14 @@ function encontrarMejorMovimiento(nimTable, tablero, player) {
         }
     }
     console.log(tablero);
-    console.log('olaa encontre algo jaja que facha', mejorMovimiento);
+    //console.log('olaa encontre algo jaja que facha', mejorMovimiento);
     for (let i = 0; i < mejorMovimiento.cantidad; i++) {
         tablero[mejorMovimiento.columna].pop();
-        console.log('seraiko');
+        //console.log('seraiko');
     }
     player = (player === 1) ? 2 : 1;
     nimTable[mejorMovimiento.columna] -= mejorMovimiento.cantidad;
     console.log(tablero);
     console.log(nimTable);
+    return mejorMovimiento;
 }
